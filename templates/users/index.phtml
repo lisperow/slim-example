@@ -1,0 +1,12 @@
+<ul>
+  <?php foreach ($users as $user): ?>
+    <li>
+      <p>
+          <?= $user['id'] ?>
+      </p>
+      <p>
+        <a href="/users/<?= $user['id'] ?>"><?= $user['firstName'] ?></a>
+      </p>
+    </li>
+    <?php endforeach ?>
+</ul>

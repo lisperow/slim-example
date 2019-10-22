@@ -20,4 +20,20 @@ $app->get('/', function ($request, $response) {
     return $this->get('renderer')->render($response, 'index.phtml');
 });
 
+$app->get('/users', function ($request, $response) use ($users) {
+    $params = [
+        'users' => $users
+    ];
+    return $this->get('renderer')->render($response, 'users/index.phtml', $params);
+});
+
+$app->get('/users/{id}', function ($request, $response, array $args) use ($users) {
+    $id = $args['id'];
+    $user = collect($users)->firstWhere('id', $id);
+    $params = [
+        'user' => $user
+    ];
+    return $this->get('renderer')->render($response, 'users/show.phtml', $params);
+});
+
 $app->run();
