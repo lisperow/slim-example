@@ -1,6 +1,6 @@
 <?php
 
-namespace Slim\Example;
+namespace Slim\Example\Tests;
 
 use PHPUnit\Framework\TestCase;
 
@@ -8,7 +8,7 @@ class Test extends TestCase
 {
     private $client;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->client = new \GuzzleHttp\Client([
             'base_uri' => 'http://localhost:8080'

@@ -1,4 +1,26 @@
 {
+    "name": "lisperow/slim-example",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Ivan Romanov",
+            "email": "lisperow@yandex.ru"
+        }
+    ],
+    "description": "example project",
+    "license": "MIT",
+    "scripts": {
+        "phpunit": "phpunit",
+        "tests": "phpunit tests"
+    },
+    "autoload": {
+        "psr-4": {
+            "Slim\\Example\\": "src/",
+            "Slim\\Example\\Tests\\": "tests"
+        },
+        "files": [
+        ]
+    },
     "require": {
         "slim/slim": "^4.3",
         "slim/psr7": "^0.6.0",
@@ -8,5 +30,8 @@
         "guzzlehttp/guzzle": "^6.3",
         "tightenco/collect": "^6.3",
         "fzaninotto/faker": "^1.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.4"
     }
 }
