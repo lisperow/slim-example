@@ -21,8 +21,13 @@ $app->get('/', function ($request, $response) {
 });
 
 $app->get('/users', function ($request, $response) use ($users) {
+    $term = $request->getQueryParam('term');
+    $result = collect($users)->filter(function ($user) use ($term) {
+        return s($user['firstName'])->startsWith($term, false);
+    });
     $params = [
-        'users' => $users
+        'term' => $term,
+        'users' => $result
     ];
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
 });
