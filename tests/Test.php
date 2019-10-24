@@ -50,5 +50,4 @@ class Test extends TestCase
         $this->client->get('/');
         $this->client->get('/post/undefined');
     }
-    }
 }
