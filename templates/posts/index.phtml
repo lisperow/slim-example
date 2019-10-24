@@ -4,14 +4,13 @@
 </form>
 
 <ul>
-  <?php foreach ($users as $user): ?>
+  <?php foreach ($posts as $post): ?>
     <li>
-      <p>
-          <?= $user['id'] ?>
-      </p>
-      <p>
-        <a href="/users/<?= $user['id'] ?>"><?= $user['firstName'] ?></a>
-      </p>
+      <a href="/posts/<?= $post['id'] ?>"><?= $post['name'] ?></a>
     </li>
-    <?php endforeach ?>
+  <?php endforeach ?>
 </ul>
+
+<div>
+  <a href="?page=<?= $page < 2 ? 1 : $page - 1 ?>">Prev</a> <a href="?page=<?= $page + 1 ?>">Next</a>
+</div>
