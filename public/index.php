@@ -53,6 +53,10 @@ $app->get('/posts/{id}', function ($request, $response, array $args) use ($repo)
     return $this->get('renderer')->render($response, 'posts/show.phtml', $params);
 })->setName('post');
 
+$app->get('/posts/new', function ($request, $response) {});
+
+$app->post('/posts', function ($request, $response) {});
+
 $app->get('/users', function ($request, $response) use ($users) {
     $term = $request->getQueryParam('term');
     $result = collect($users)->filter(function ($user) use ($term) {
