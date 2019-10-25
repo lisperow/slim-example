@@ -1,25 +1,6 @@
 <a href="/posts">Посты</a>
 
 <form action="/posts" method="post">
-    <div>
-        <label>
-            Название *
-            <input type="text" name="post[name]" value="<?= htmlspecialchars($postData['name'] ?? ''); ?>">
-        </label>
-        <?php if (isset($errors['name'])): ?>
-            <div><?= $errors['name'] ?></div>
-        <?php endif ?>
-        </div>
-    </div>
-    <div>
-        <label>
-            Текст *
-            <input type="text" name="post[body]" value="<?= htmlspecialchars($postData['body'] ?? ''); ?>">
-        </label>
-        <?php if (isset($errors['body'])): ?>
-        <div><?= $errors['body'] ?></div>
-        <?php endif ?>
-    </div>
-    </div>
+    <?php require '_form.phtml' ?>
     <input type="submit" value="Create">
 </form>

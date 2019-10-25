@@ -16,6 +16,7 @@ $container->set('flash', function () {
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
+$app->add(MethodOverrideMiddleware::class);
 
 $repo = new Slim\Example\Repository();
 $router = $app->getRouteCollector()->getRouteParser();
@@ -57,7 +58,7 @@ $app->get('/posts/new', function ($request, $response) {
 $app->post('/posts', function ($request, $response) use ($router, $repo) {
     $post = $request->getParsedBodyParam('post');
 
-    $validator = new App\Validator();
+    $validator = new Slim\Example\Validator();
     $errors = $validator->validate($post);
 
     if (count($errors) === 0) {
@@ -76,16 +77,40 @@ $app->post('/posts', function ($request, $response) use ($router, $repo) {
     return $this->get('renderer')->render($response, 'posts/new.phtml', $params);
 });
 
-$app->get('/users', function ($request, $response) use ($users) {
-    $term = $request->getQueryParam('term');
-    $result = collect($users)->filter(function ($user) use ($term) {
-        return s($user['firstName'])->startsWith($term, false);
-    });
+$app->get('/posts/{id}/edit', function ($request, $response, array $args) use ($repo) {
+    $id = $args['id'];
+    $post = $repo->find($id);
     $params = [
-        'term' => $term,
-        'users' => $result
+        'post' => $post,
+        'errors' => []
     ];
-    return $this->get('renderer')->render($response, 'users/index.phtml', $params);
+    return $this->get('renderer')->render($response, 'posts/edit.phtml', $params);
+})->setName('editPost');
+
+$app->patch('/posts/{id}', function ($request, $response, array $args) use ($repo, $router) {
+    $id = $args['id'];
+    $post = $repo->find($id);
+    $data = $request->getParsedBodyParam('post');
+
+    $validator = new Slim\Example\Validator();
+    $errors = $validator->validate($data);
+
+    if (count($errors) === 0) {
+        $post['name'] = $data['name'];
+
+        $this->get('flash')->addMessage('success', 'Post has been update');
+        $repo->save($post);
+        $url = $router->urlFor('editPost', ['id' => $post['id']]);
+        return $response->withRedirect($url);
+    }
+
+    $params = [
+        'postData' => $data,
+        'post' => $post,
+        'errors' => $errors
+    ];
+    $response->withStatus(422);
+    return $this->get('renderer')->render($response, 'posts/edit.phtml', $params);
 });
 
 $app->run();

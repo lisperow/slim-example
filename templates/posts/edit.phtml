@@ -1,22 +1,7 @@
-<form action="/posts/<?= htmlspecialchars($post['id']) ?>" method="post">
-    <input type="hidden" name="_METHOD" value="PATCH">
-    <div>
-      <label>
-          Название *
-          <input type="text" name="post[name]" value="<?= htmlspecialchars($post['name'] ?? ''); ?>">
-      </label>
-      <?php if (isset($errors['name'])): ?>
-      <div><?= $errors['name'] ?></div>
-      <?php endif ?>
-    </div>
-    <div>
-      <label>
-          Текст *
-          <input type="text" name="post[body]" value="<?= htmlspecialchars($post['body'] ?? ''); ?>">
-      </label>
-      <?php if (isset($errors['name'])): ?>
-      <div><?= $errors['body'] ?></div>
-      <?php endif ?>
-    </div>
-    <input type="submit" value="Update">
+<a href="/posts">Посты</a>
+
+<form action="/posts/<?= $post['id'] ?>" method="post">
+  <input type="hidden" name="_METHOD" value="PATCH">
+  <?php require '_form.phtml' ?>
+  <input type="submit" value="Update">
 </form>
