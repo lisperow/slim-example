@@ -19,35 +19,30 @@ class Test extends TestCase
     public function testPosts()
     {
         $this->client->get('/');
-        $response = $this->client->get('/posts');
+        $this->client->get('/posts');
+        $response = $this->client->get('/posts/new');
         $body = $response->getBody()->getContents();
+        $this->assertContains('post[name]', $body);
+        $this->assertContains('post[body]', $body);
 
-        $this->assertContains('Qui illo error nihil laborum vero', $body);
-        $this->assertNotContains('Dicta voluptas fuga totam reiciendis qui', $body);
-
-        $response2 = $this->client->get('/posts?page=2');
-        $body2 = $response2->getBody()->getContents();
-        $this->assertContains('?page=1', $body2);
-        $this->assertContains('?page=3', $body2);
-
-        $this->assertNotContains('Itaque quibusdam tempora velit porro ut velit soluta', $body2);
-        $this->assertContains('Porro amet laborum iure molestiae', $body2);
-    }
-
-    public function testPost()
-    {
-        $response = $this->client->get("/posts/0b13e52d-b058-32fb-8507-10dec634a07c");
+        $formParams = ['post' => ['name' => '', 'body' => '']];
+        $response = $this->client->post('/posts', [
+            /* 'debug' => true, */
+            'form_params' => $formParams,
+            'http_errors' => false
+        ]);
+        $this->assertEquals(422, $response->getStatusCode());
         $body = $response->getBody()->getContents();
-        $this->assertContains('Quam ipsam voluptatem cupiditate sed natus debitis voluptas.', $body);
-    }
+        $this->assertContains("Can't be blank", $body);
 
-    /**
-     * @expectedException \GuzzleHttp\Exception\ClientException
-     * @expectedExceptionMessage 404
-     */
-    public function testPostNotFound()
-    {
-        $this->client->get('/');
-        $this->client->get('/post/undefined');
+        $formParams = ['post' => ['name' => 'second', 'body' => 'another']];
+        $response = $this->client->post('/posts', [
+            /* 'debug' => true, */
+            'form_params' => $formParams
+        ]);
+        $body = $response->getBody()->getContents();
+        $this->assertContains('Post has been created', $body);
+        $this->assertContains('first', $body);
+        $this->assertContains('second', $body);
     }
 }
