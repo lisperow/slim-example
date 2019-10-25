@@ -27,16 +27,9 @@ $app->get('/', function ($request, $response) {
 $app->get('/posts', function ($request, $response) use ($repo) {
     $flash = $this->get('flash')->getMessages();
 
-    $posts = $repo->all();
-    $page = $request->getQueryParam('page', 1);
-    $per = $request->getQueryParam('per', 5);
-    $offset = ($page - 1) * $per;
-
-    $sliceOfPosts = array_slice($posts, $offset, $per);
     $params = [
         'flash' => $flash,
-        'page' => $page
-        'posts' => $sliceOfPosts
+        'posts' => $repo->all()
     ];
     return $this->get('renderer')->render($response, 'posts/index.phtml', $params);
 })->setName('posts');
