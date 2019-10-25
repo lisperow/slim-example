@@ -9,18 +9,24 @@ $container = new Container();
 $container->set('renderer', function () {
     return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
 });
+$container->set('flash', function () {
+    return new \Slim\Flash\Messages();
+});
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
 $repo = new Slim\Example\Repository();
+$router = $app->getRouteCollector()->getRouteParser();
 
 $app->get('/', function ($request, $response) {
     return $this->get('renderer')->render($response, 'index.phtml');
 });
 
 $app->get('/posts', function ($request, $response) use ($repo) {
+    $flash = $this->get('flash')->getMessages();
+
     $posts = $repo->all();
     $page = $request->getQueryParam('page', 1);
     $per = $request->getQueryParam('per', 5);
@@ -28,6 +34,7 @@ $app->get('/posts', function ($request, $response) use ($repo) {
 
     $sliceOfPosts = array_slice($posts, $offset, $per);
     $params = [
+        'flash' => $flash,
         'page' => $page
         'posts' => $sliceOfPosts
     ];
