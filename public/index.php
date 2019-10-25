@@ -56,20 +56,20 @@ $app->get('/posts/new', function ($request, $response) {
 })->setName('newPost');
 
 $app->post('/posts', function ($request, $response) use ($router, $repo) {
-    $post = $request->getParsedBodyParam('post');
+    $postData = $request->getParsedBodyParam('post');
 
     $validator = new Slim\Example\Validator();
-    $errors = $validator->validate($post);
+    $errors = $validator->validate($postData);
 
     if (count($errors) === 0) {
-        $repo->save($post);
+        $repo->save($postData);
         $this->get('flash')->addMessage('success', 'Post has been created');
         $url = $router->urlFor('posts');
         return $response->withRedirect($url);
     }
 
     $params = [
-        'post' => $post,
+        'postData' => $postData,
         'errors' => $errors
     ];
 
@@ -81,8 +81,8 @@ $app->get('/posts/{id}/edit', function ($request, $response, array $args) use ($
     $id = $args['id'];
     $post = $repo->find($id);
     $params = [
-        'post' => $post,
-        'errors' => []
+        'postData' => $post,
+        'post' => $post
     ];
     return $this->get('renderer')->render($response, 'posts/edit.phtml', $params);
 })->setName('editPost');
@@ -97,10 +97,11 @@ $app->patch('/posts/{id}', function ($request, $response, array $args) use ($rep
 
     if (count($errors) === 0) {
         $post['name'] = $data['name'];
+        $post['body'] = $data['body'];
 
-        $this->get('flash')->addMessage('success', 'Post has been update');
         $repo->save($post);
-        $url = $router->urlFor('editPost', ['id' => $post['id']]);
+        $this->get('flash')->addMessage('success', 'Post has been updated');
+        $url = $router->urlFor('posts');
         return $response->withRedirect($url);
     }
 
@@ -109,8 +110,15 @@ $app->patch('/posts/{id}', function ($request, $response, array $args) use ($rep
         'post' => $post,
         'errors' => $errors
     ];
-    $response->withStatus(422);
-    return $this->get('renderer')->render($response, 'posts/edit.phtml', $params);
+    return $this->get('renderer')->render($response->withStatus(422), 'posts/edit.phtml', $params);
+});
+
+$app->delete('/posts/{id}', function ($request, $response, array $args) use ($repo, $router) {
+    $id = $args['id'];
+    $repo->destroy($id);
+    $this->get('flash')->addMessage('success', 'Post has been removed');
+
+    return $response->withRedirect($router->urlFor('posts'));
 });
 
 $app->run();
