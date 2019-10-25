@@ -45,4 +45,28 @@ class Test extends TestCase
         $this->assertContains('first', $body);
         $this->assertContains('second', $body);
     }
+
+    public function testDeletePost()
+    {
+        $this->client->get('/');
+        $this->client->get('/posts');
+        $name = 'lalala';
+        $formParams = ['post' => ['name' => $name, 'body' => 'last']];
+        $response = $this->client->post('/posts', [
+            /* 'debug' => true, */
+            'form_params' => $formParams,
+            'allow_redirects' => false
+        ]);
+        $id = $response->getHeaderLine('X-ID');
+        $this->assertEquals(302, $response->getStatusCode());
+
+        $response = $this->client->delete("/posts/{$id}", [
+            /* 'debug' => true, */
+            'allow_redirects' => false
+        ]);
+        $this->assertEquals(302, $response->getStatusCode());
+        $response = $this->client->get('/posts');
+        $body = $response->getBody()->getContents();
+        $this->assertNotContains($name, $body);
+    }
 }
