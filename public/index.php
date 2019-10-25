@@ -46,9 +46,35 @@ $app->get('/posts/{id}', function ($request, $response, array $args) use ($repo)
     return $this->get('renderer')->render($response, 'posts/show.phtml', $params);
 })->setName('post');
 
-$app->get('/posts/new', function ($request, $response) {});
+$app->get('/posts/new', function ($request, $response) {
+    $params = [
+        'postData' => [],
+        'errors' => []
+    ];
+    return $this->get('renderer')->render($response, 'posts/new.phtml', $params);
+})->setName('newPost');
 
-$app->post('/posts', function ($request, $response) {});
+$app->post('/posts', function ($request, $response) use ($router, $repo) {
+    $post = $request->getParsedBodyParam('post');
+
+    $validator = new App\Validator();
+    $errors = $validator->validate($post);
+
+    if (count($errors) === 0) {
+        $repo->save($post);
+        $this->get('flash')->addMessage('success', 'Post has been created');
+        $url = $router->urlFor('posts');
+        return $response->withRedirect($url);
+    }
+
+    $params = [
+        'post' => $post,
+        'errors' => $errors
+    ];
+
+    $response = $response->withStatus(422);
+    return $this->get('renderer')->render($response, 'posts/new.phtml', $params);
+});
 
 $app->get('/users', function ($request, $response) use ($users) {
     $term = $request->getQueryParam('term');
